@@ -1,9 +1,7 @@
 #!/bin/bash
 
 pwd="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-
 . "${pwd}/common.sh"
-
 begin
 
 mkdir -p .git/refs
