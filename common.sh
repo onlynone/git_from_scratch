@@ -1,5 +1,6 @@
 fail () {
     printf "%s\n" "${1}" >> /dev/stderr
+    end
     exit 1
 }
 
