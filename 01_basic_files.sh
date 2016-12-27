@@ -1,22 +1,14 @@
 #!/bin/bash
-set -e
 
-fail () {
-    printf "%s\n" "${1}" >> /dev/stderr
-    exit 1
-}
+pwd="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
+. "${pwd}/common.sh"
 
-test -n "${REPO_DIR}" || fail "REPO_DIR is empty"
-test -d "${REPO_DIR}" || fail "REPO_DIR is not a directory"
-
-pushd "${REPO_DIR}"
+begin
 
 mkdir -p .git/refs
 mkdir -p .git/objects
 echo "ref: refs/heads/master" > .git/HEAD
-
-
 
 #cat - > .git/config <<EOF
 #[core]
@@ -28,5 +20,4 @@ echo "ref: refs/heads/master" > .git/HEAD
 #    precomposeunicode = true
 #EOF
 
-
-popd
+end
