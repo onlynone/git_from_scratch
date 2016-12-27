@@ -7,22 +7,26 @@ fail () {
 }
 
 
-test -n "${GIT_DIR}" || fail "GIT_DIR is empty"
-test -d "${GIT_DIR}" || fail "GIT_DIR is not a directory"
+test -n "${REPO_DIR}" || fail "REPO_DIR is empty"
+test -d "${REPO_DIR}" || fail "REPO_DIR is not a directory"
 
-pushd "${GIT_DIR}"
+pushd "${REPO_DIR}"
 
-test -d .git || mkdir .git
+mkdir -p .git/refs
+mkdir -p .git/objects
+echo "ref: refs/heads/master" > .git/HEAD
 
-cat - > .git/config <<EOF
-[core]
-    repositoryformatversion = 0
-    filemode = true
-    bare = false
-    logallrefupdates = true
-    ignorecase = true
-    precomposeunicode = true
-EOF
+
+
+#cat - > .git/config <<EOF
+#[core]
+#    repositoryformatversion = 0
+#    filemode = true
+#    bare = false
+#    logallrefupdates = true
+#    ignorecase = true
+#    precomposeunicode = true
+#EOF
 
 
 popd
