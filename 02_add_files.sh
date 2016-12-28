@@ -4,80 +4,36 @@ pwd="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 . "${pwd}/common.sh"
 begin
 
+test -n "$1" || fail "No file content given as argument"
+content="$1"
 
 # Write some file content out to a file
-first_file=$(mktemp -t XXXXX)
-cat > ${first_file} <<EOF
-first
-file
-content
-EOF
+file=$(mktemp -t XXXXX)
+printf "%s" "$1" > ${file}
 
 
 # Get the size of the content
-size=$(wc -c ${first_file} | awk '{print $1}')
+size=$(wc -c ${file} | awk '{print $1}')
 
 
 # Write the file out as a git 'blob' object
-first_file_object=$(mktemp -t XXXXX)
-printf "blob %d\000" ${size} >> ${first_file_object}
-cat ${first_file} >> ${first_file_object}
+file_object=$(mktemp -t XXXXX)
+printf "blob %d\000" ${size} >> ${file_object}
+cat ${file} >> ${file_object}
 
 
 # Find the sha1 hash of the object
-first_file_object_hash=$(sha1sum ${first_file_object} | cut -f1 -d' ')
+file_object_hash=$(sha1sum ${file_object} | cut -f1 -d' ')
 
 
 # Get the file name under .git/objects for the object
-object_sub_dir=$(echo ${first_file_object_hash} | cut -c1,2)
-object_fname=$(echo ${first_file_object_hash} | cut -c3-)
+object_sub_dir=$(echo ${file_object_hash} | cut -c1,2)
+object_fname=$(echo ${file_object_hash} | cut -c3-)
 
 
 # Write the compressed object to the objects directory
 mkdir -p .git/objects/${object_sub_dir}
-zlib-flate -compress <${first_file_object} > .git/objects/${object_sub_dir}/${object_fname}
+zlib-flate -compress <${file_object} > .git/objects/${object_sub_dir}/${object_fname}
 
-rm ${first_file}
-rm ${first_file_object}
-
-
-
-
-
-# Write some file content out to a file
-second_file=$(mktemp -t XXXXX)
-cat > ${second_file} <<EOF
-second
-file
-content
-EOF
-
-
-# Get the size of the content
-size=$(wc -c ${second_file} | awk '{print $1}')
-
-
-# Write the file out as a git 'blob' object
-second_file_object=$(mktemp -t XXXXX)
-printf "blob %d\000" ${size} >> ${second_file_object}
-cat ${second_file} >> ${second_file_object}
-
-
-# Find the sha1 hash of the object
-second_file_object_hash=$(sha1sum ${second_file_object} | cut -f1 -d' ')
-
-
-# Get the file name under .git/objects for the object
-object_sub_dir=$(echo ${second_file_object_hash} | cut -c1,2)
-object_fname=$(echo ${second_file_object_hash} | cut -c3-)
-
-
-# Write the compressed object to the objects directory
-mkdir -p .git/objects/${object_sub_dir}
-zlib-flate -compress <${second_file_object} > .git/objects/${object_sub_dir}/${object_fname}
-
-rm ${second_file}
-rm ${second_file_object}
-
-
-end
+rm ${file}
+rm ${file_object}
